@@ -1,7 +1,10 @@
 import os
 
 import json
+from pathlib import Path
+
 import requests
+from tqdm import tqdm
 
 
 class Client:
@@ -19,8 +22,11 @@ class Client:
 
     @staticmethod
     def get_response(response):
-        if response.status_code != requests.codes.ok:
-            raise requests.HTTPError(response.status_code, response.reason)
+        if not response.ok:
+            if 400 <= response.status_code < 500:
+                raise requests.HTTPError(response.status_code, response.reason, response.json())
+            else:
+                raise requests.HTTPError(response.status_code, response.reason)
         return response.json()
 
     def get_url(self, path):
@@ -62,5 +68,49 @@ class Client:
         return self.get_response(response)
 
     def list_dataset(self):
-        path = 'datasets'
+        path = 'datasets/'
         return self._get(path)
+
+    def import_dataset(self, dataset_id, dataset, project_id=None):
+
+        # TODO validate datset with schema
+
+        for data in tqdm(dataset):
+            for name, path in data['files'].items():
+                data_file = self.create_data_file(path)
+                data['dataset'] = dataset_id
+                data['files'][name] = {
+                    'checksum': data_file['checksum'],
+                    'path': str(path)
+                }
+
+        data_units = self.create_data_units(dataset)
+
+        if project_id:
+            labels_data = []
+            for data, data_unit in zip(dataset, data_units):
+
+                labels_data.append({
+                  'project': project_id,
+                  'data_unit': data_unit['id'],
+                  'ground_truth': data['ground_truth']
+                })
+
+            self.create_labels(labels_data)
+
+    def create_data_file(self, file_path):
+        path = 'data_files/'
+        url = self.get_url(path)
+        headers = self.get_headers()
+        response = self.requests_session.post(
+            url, headers=headers, files={'file': file_path.open(mode='rb')}
+        )
+        return self.get_response(response)
+
+    def create_data_units(self, data):
+        path = 'data_units/'
+        return self._post(path, payload=data)
+
+    def create_labels(self, data):
+        path = 'labels/'
+        return self._post(path, payload=data)
