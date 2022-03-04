@@ -89,12 +89,14 @@ class Client:
         if project_id:
             labels_data = []
             for data, data_unit in zip(dataset, data_units):
-
-                labels_data.append({
+                label_data = {
                   'project': project_id,
-                  'data_unit': data_unit['id'],
-                  'ground_truth': data['ground_truth']
-                })
+                  'data_unit': data_unit['id']
+                }
+                if 'ground_truth' in data:
+                    label_data['ground_truth'] = data['ground_truth']
+
+                labels_data.append(label_data)
 
             self.create_labels(labels_data)
 
