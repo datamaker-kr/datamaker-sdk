@@ -1,7 +1,6 @@
 import os
 
 import json
-from pathlib import Path
 
 import requests
 from tqdm import tqdm
@@ -66,6 +65,23 @@ class Client:
             url, headers=headers, data=json.dumps(payload)
         )
         return self.get_response(response)
+
+    def log(self, task_id, action, data):
+        path = 'logs/'
+        payload = {
+            'task_id': task_id,
+            'action': action,
+            'data': data
+        }
+        return self._post(path, payload=payload)
+
+    def get_model(self, model_id):
+        path = f'models/{model_id}/'
+        payload = {
+            'expand': 'plugin',
+            'fields': ['code', 'plugin.code', 'plugin.name', 'files']
+        }
+        return self._get(path, payload=payload)
 
     def list_dataset(self):
         path = 'datasets/'
