@@ -55,3 +55,6 @@ class BaseNet(BasePlugin):
 
     def infer(self, input_data):
         raise NotImplementedError
+
+    def log_iteration(self, epoch, i, **kwargs):
+        self.log('iteration', {'epoch': epoch, 'iteration': i, **kwargs})

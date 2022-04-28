@@ -116,6 +116,16 @@ class Client:
 
             self.create_labels(labels_data)
 
+    def create_task(self, agent, task_id, service, params):
+        path = 'agent_tasks/'
+        payload = {
+            'id': task_id,
+            'agent': agent,
+            'service': service,
+            'params': params
+        }
+        return self._post(path, payload=payload)
+
     def create_data_file(self, file_path):
         path = 'data_files/'
         url = self.get_url(path)

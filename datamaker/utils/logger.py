@@ -27,4 +27,4 @@ class Logger:
 
     def log(self, action, data):
         if self.client and self.task:
-            self.client.log(self.task.id, action, data)
+            self.client.log(self.task.request.id, action, data)
