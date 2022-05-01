@@ -1,8 +1,11 @@
 import os
 
 import json
+from pathlib import Path
 
 import requests
+from django.utils.translation import gettext as _
+from exceptions import ClientError
 from tqdm import tqdm
 
 
@@ -19,17 +22,10 @@ class Client:
         requests_session = requests.Session()
         self.requests_session = requests_session
 
-    @staticmethod
-    def get_response(response):
-        if not response.ok:
-            if 400 <= response.status_code < 500:
-                raise requests.HTTPError(response.status_code, response.reason, response.json())
-            else:
-                raise requests.HTTPError(response.status_code, response.reason)
-        return response.json()
-
     def get_url(self, path):
-        return os.path.join(self.base_url, path)
+        if not path.startswith('http'):
+            return os.path.join(self.base_url, path)
+        return path
 
     def get_headers(self):
         headers = {'Authorization': f'Token {self.token}'}
@@ -40,48 +36,65 @@ class Client:
     def set_workspace(self, code):
         self.workspace_code = code
 
+    def request(self, method, *args, **kwargs):
+        try:
+            response = getattr(self.requests_session, method)(*args, **kwargs)
+            if not response.ok:
+                raise ClientError(
+                    response.status_code,
+                    response.json() if response.status_code == 400 else response.reason
+                )
+        except requests.ConnectionError:
+            raise ClientError(408, _('서버가 응답하지 않습니다.'))
+        return response.json()
+
     def _get(self, path, payload=None):
         url = self.get_url(path)
         headers = self.get_headers()
-        response = self.requests_session.get(
-            url, headers=headers, params=payload
-        )
-        return self.get_response(response)
+        return self.request('get', url, headers=headers, params=payload)
 
-    def _post(self, path, payload=None):
+    def _post(self, path, payload=None, **kwargs):
         url = self.get_url(path)
         headers = self.get_headers()
-        headers['Content-Type'] = 'application/json'
-        response = self.requests_session.post(
-            url, headers=headers, data=json.dumps(payload)
-        )
-        return self.get_response(response)
+        if 'files' in kwargs:
+            kwargs['data'] = payload
+        else:
+            headers['Content-Type'] = 'application/json'
+            kwargs['data'] = json.dumps(payload)
+        return self.request('post', url, headers=headers, **kwargs)
 
-    def _patch(self, path, payload=None):
+    def _patch(self, path, payload=None, **kwargs):
         url = self.get_url(path)
         headers = self.get_headers()
-        headers['Content-Type'] = 'application/json'
-        response = self.requests_session.patch(
-            url, headers=headers, data=json.dumps(payload)
-        )
-        return self.get_response(response)
+        if 'files' in kwargs:
+            kwargs['data'] = payload
+        else:
+            headers['Content-Type'] = 'application/json'
+            kwargs['data'] = json.dumps(payload)
+        return self.request('patch', url, headers=headers, **kwargs)
 
-    def log(self, task_id, action, data):
+    def log(self, data):
         path = 'logs/'
-        payload = {
-            'task_id': task_id,
-            'action': action,
-            'data': data
-        }
-        return self._post(path, payload=payload)
+        return self._post(path, payload=data)
 
-    def get_model(self, model_id):
+    def get_model(self, model_id, payload=None):
         path = f'models/{model_id}/'
-        payload = {
-            'expand': 'plugin',
-            'fields': ['code', 'plugin.code', 'plugin.name', 'files']
-        }
         return self._get(path, payload=payload)
+
+    def create_model(self, data):
+        path = 'models/'
+        return self._post(path, payload=data)
+
+    def update_model(self, code, data, files=None):
+        path = f'models/{code}/'
+        kwargs = {
+            'payload': data
+        }
+        if files:
+            kwargs['files'] = {}
+            for name, file in files.items():
+                kwargs['files'][name] = Path(file).open(mode='rb')
+        return self._patch(path, **kwargs)
 
     def list_dataset(self):
         path = 'datasets/'
@@ -106,8 +119,8 @@ class Client:
             labels_data = []
             for data, data_unit in zip(dataset, data_units):
                 label_data = {
-                  'project': project_id,
-                  'data_unit': data_unit['id']
+                    'project': project_id,
+                    'data_unit': data_unit['id']
                 }
                 if 'ground_truth' in data:
                     label_data['ground_truth'] = data['ground_truth']
@@ -128,12 +141,7 @@ class Client:
 
     def create_data_file(self, file_path):
         path = 'data_files/'
-        url = self.get_url(path)
-        headers = self.get_headers()
-        response = self.requests_session.post(
-            url, headers=headers, files={'file': file_path.open(mode='rb')}
-        )
-        return self.get_response(response)
+        return self._post(path, files={'file': file_path.open(mode='rb')})
 
     def create_data_units(self, data):
         path = 'data_units/'
@@ -142,3 +150,18 @@ class Client:
     def create_labels(self, data):
         path = 'labels/'
         return self._post(path, payload=data)
+
+    def list_labels(self, path=None, list_all=False, payload=None):
+        if not path:
+            path = 'labels/'
+        response = self._get(path, payload=payload)
+        if list_all:
+            if response['next']:
+                return response['results'] + self.list_labels(
+                    path=response['next'],
+                    list_all=list_all,
+                    payload=payload
+                )
+            else:
+                return response['results']
+        return response

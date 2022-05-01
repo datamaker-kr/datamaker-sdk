@@ -22,3 +22,6 @@ class BasePlugin:
 
     def log(self, action, data):
         self.logger.log(action, data)
+
+    def log_message(self, message):
+        self.logger.log('message', {'content': message})

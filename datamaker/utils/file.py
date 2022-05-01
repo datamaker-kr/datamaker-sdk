@@ -7,7 +7,7 @@ from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 
 
-def download_file(url, path_download, name=None):
+def download_file(url, path_download, name=None, coerce=None):
     if name:
         name += Path(url).suffix
     else:
@@ -22,15 +22,17 @@ def download_file(url, path_download, name=None):
         if not path.is_file():
             r = requests.get(url, allow_redirects=True)
             open(str(path), 'wb').write(r.content)
+    if coerce:
+        path = coerce(path)
     return path
 
 
-def files_url_to_path(files):
+def files_url_to_path(files, coerce=None):
     path_download = Path('/tmp/agent/media')
     path_download.mkdir(parents=True, exist_ok=True)
     for file_name in files:
         url = files[file_name]
-        files[file_name] = download_file(url, path_download)
+        files[file_name] = download_file(url, path_download, coerce=coerce)
 
 
 def get_file_from_url(url):
