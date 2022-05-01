@@ -29,17 +29,23 @@ class Logger:
                 state='PROGRESS',
                 meta=self.progress_records
             )
+        else:
+            print(self.progress_records)
 
     def log(self, action, data):
+        log = {
+            'action': action,
+            'data': data,
+            'datetime': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S.%f')
+        }
+
         if self.client and self.task:
-            self.logs_queue.append({
-                'task_id': self.task.request.id,
-                'action': action,
-                'data': data,
-                'datetime': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S.%f')
-            })
+            log['task_id'] = self.task.request.id
+            self.logs_queue.append(log)
             try:
                 self.client.log(self.logs_queue)
                 self.logs_queue.clear()
             except ClientError:
                 pass
+        else:
+            print(log)

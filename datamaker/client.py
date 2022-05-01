@@ -151,13 +151,17 @@ class Client:
         path = 'labels/'
         return self._post(path, payload=data)
 
-    def list_labels(self, path=None, list_all=False, payload=None):
+    def list_labels(self, payload=None):
+        path = 'labels/'
+        return self._get(path, payload=payload)
+
+    def list_train_dataset(self, path=None, list_all=False, payload=None):
         if not path:
-            path = 'labels/'
+            path = 'train_dataset/'
         response = self._get(path, payload=payload)
         if list_all:
             if response['next']:
-                return response['results'] + self.list_labels(
+                return response['results'] + self.list_train_dataset(
                     path=response['next'],
                     list_all=list_all,
                     payload=payload

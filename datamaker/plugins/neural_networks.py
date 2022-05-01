@@ -39,24 +39,22 @@ class BaseNet(BasePlugin):
     def get_input_dataset_for_training(self, model_code):
         client = self.logger.client
         assert bool(client)
-        input_dataset = []
 
-        labels = client.list_labels(
-            payload={
-                'expand': ['files', 'ground_truth'],
-                'fields': ['id', 'files', 'ground_truth'],
-                'model_train': model_code
-            },
+        category_int_to_str = {1: 'train', 2: 'validation', 3: 'test'}
+        input_dataset = {'train': [], 'validation': [], 'test': []}
+
+        train_dataset = client.list_train_dataset(
+            payload={'model': model_code},
             list_all=True
         )
 
-        count_labels = len(labels)
-        for i, label in enumerate(labels, start=1):
-            self.set_progress(i, count_labels, category='dataset_download')
-            input_dataset.append({
-                'label_id': label['id'],
-                'files': files_url_to_path(label['files']),
-                'ground_truth': label['ground_truth']['data']
+        count_dataset = len(train_dataset)
+        for i, train_data in enumerate(train_dataset, start=1):
+            self.set_progress(i, count_dataset, category='dataset_download')
+            category = category_int_to_str[train_data['category']]
+            input_dataset[category].append({
+                'files': files_url_to_path(train_data['files']),
+                'ground_truth': train_data['ground_truth']['data']
             })
 
         return input_dataset
@@ -114,6 +112,27 @@ class BaseNet(BasePlugin):
         raise NotImplementedError
 
     def train(self, input_dataset, hyperparameter, checkpoint=None):
+        """
+        :param input_dataset:
+        {
+            "train": [
+                {
+                    "files": {
+                        "image": "/path/to/image.jpg"
+                    },
+                    "ground_truth": {
+                        ...label_data
+                    }
+                },
+                ...
+            ],
+            "validation": ...,
+            "test": ...
+        }
+        :param hyperparameter:
+        :param checkpoint:
+        :return:
+        """
         raise NotImplementedError
 
     def test(self, ground_truth, prediction):
