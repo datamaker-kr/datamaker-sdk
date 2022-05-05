@@ -81,8 +81,8 @@ class Client(*mixins):
     def _list(self, path, payload=None, list_all=False):
         response = self._get(path, payload=payload)
         if list_all:
+            yield from response['results']
             if response['next']:
-                return response['results'] + self._list(response['next'], payload=payload, list_all=list_all)
-            else:
-                return response['results']
-        return response
+                yield from self._list(response['next'], payload=payload, list_all=list_all)
+        else:
+            return response
