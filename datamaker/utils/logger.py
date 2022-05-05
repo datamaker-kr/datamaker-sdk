@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.utils import timezone
 
-from datamaker.exceptions import ClientError
+from datamaker.client.exceptions import ClientError
 
 
 class Logger:
@@ -43,7 +43,7 @@ class Logger:
             log['task_id'] = self.task.request.id
             self.logs_queue.append(log)
             try:
-                self.client.log(self.logs_queue)
+                self.client.create_logs(self.logs_queue)
                 self.logs_queue.clear()
             except ClientError:
                 pass

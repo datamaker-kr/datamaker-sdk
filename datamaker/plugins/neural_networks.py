@@ -54,7 +54,7 @@ class BaseNet(BasePlugin):
             category = category_int_to_str[train_data['category']]
             input_dataset[category].append({
                 'files': files_url_to_path(train_data['files']),
-                'ground_truth': train_data['ground_truth']['data']
+                'ground_truth': train_data['ground_truth']
             })
 
         return input_dataset
