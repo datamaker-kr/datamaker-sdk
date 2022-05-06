@@ -14,6 +14,7 @@ class BaseNet(BasePlugin):
 
     model = None
     input_schema = None
+    count_iterations = None
 
     def set_model(self, model):
         self.model = model
@@ -61,6 +62,8 @@ class BaseNet(BasePlugin):
     def run_train(self, model, **kwargs):
         client = self.logger.client
         assert bool(client)
+
+        self.count_iterations = model['configuration']['hyperparameter']['iterations']
 
         # download dataset
         self.log_message(_('학습 데이터셋 준비를 시작합니다.'))
@@ -142,5 +145,6 @@ class BaseNet(BasePlugin):
     def infer(self, model, input_data):
         raise NotImplementedError
 
-    def log_iteration(self, epoch, i, **kwargs):
-        self.log('iteration', {'epoch': epoch, 'iteration': i, **kwargs})
+    def log_iteration(self, i, **kwargs):
+        self.log('iteration', {'iteration': i, **kwargs})
+        self.set_progress(i, self.count_iterations, category='iteration')
