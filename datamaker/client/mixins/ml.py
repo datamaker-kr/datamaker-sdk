@@ -1,8 +1,15 @@
+from ..utils import get_default_url_conversion
+
+
 class MLClientMixin:
 
-    def get_model(self, pk, payload=None):
+    def get_model(self, pk, payload=None, url_conversion=None):
         path = f'models/{pk}/'
-        return self._get(path, payload=payload)
+        url_conversion = get_default_url_conversion(
+            url_conversion,
+            files_fields=['files', 'parent.files'], is_list=False
+        )
+        return self._get(path, payload, url_conversion)
 
     def create_model(self, data):
         path = 'models/'
@@ -12,6 +19,7 @@ class MLClientMixin:
         path = f'models/{pk}/'
         return self._patch(path, payload=data, files=files)
 
-    def list_train_dataset(self, payload=None, list_all=False):
+    def list_train_dataset(self, payload=None, url_conversion=None, list_all=False):
         path = 'train_dataset/'
-        return self._list(path, payload, list_all)
+        url_conversion = get_default_url_conversion(url_conversion, files_fields=['files'])
+        return self._list(path, payload, url_conversion, list_all)

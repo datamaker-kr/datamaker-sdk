@@ -1,4 +1,6 @@
+import operator
 import os
+from functools import reduce
 from pathlib import Path
 
 import requests
@@ -33,6 +35,19 @@ def files_url_to_path(files, coerce=None):
     for file_name in files:
         url = files[file_name]
         files[file_name] = download_file(url, path_download, coerce=coerce)
+
+
+def files_url_to_path_from_objs(objs, files_fields, coerce=None, is_list=False):
+    if not is_list:
+        objs = [objs]
+
+    for obj in objs:
+        for files_field in files_fields:
+            try:
+                files = reduce(operator.getitem, files_field.split('.'), obj)
+                files_url_to_path(files, coerce=coerce)
+            except KeyError:
+                pass
 
 
 def get_file_from_url(url):

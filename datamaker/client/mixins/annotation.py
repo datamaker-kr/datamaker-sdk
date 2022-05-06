@@ -1,9 +1,17 @@
+from ..utils import get_default_url_conversion
+
+
 class AnnotationClientMixin:
 
-    def list_labels(self, payload=None, list_all=False):
+    def list_labels(self, payload=None, url_conversion=None, list_all=False):
         path = 'labels/'
-        return self._list(path, payload, list_all)
+        url_conversion = get_default_url_conversion(url_conversion, files_fields=['files'])
+        return self._list(path, payload, url_conversion, list_all)
 
     def create_labels(self, data):
         path = 'labels/'
         return self._post(path, payload=data)
+
+    def set_tags_labels(self, data, params=None):
+        path = 'labels/set_tags/'
+        return self._post(path, payload=data, params=params)

@@ -43,19 +43,18 @@ class BaseNet(BasePlugin):
         category_int_to_str = {1: 'train', 2: 'validation', 3: 'test'}
         input_dataset = {'train': [], 'validation': [], 'test': []}
 
-        train_dataset = client.list_train_dataset(
-            payload={'model': model_code},
+        train_dataset, count_dataset = client.list_train_dataset(
+            payload={
+                'fields': ['category', 'files', 'ground_truth'],
+                'model': model_code
+            },
             list_all=True
         )
 
-        count_dataset = len(train_dataset)
         for i, train_data in enumerate(train_dataset, start=1):
             self.set_progress(i, count_dataset, category='dataset_download')
-            category = category_int_to_str[train_data['category']]
-            input_dataset[category].append({
-                'files': files_url_to_path(train_data['files']),
-                'ground_truth': train_data['ground_truth']
-            })
+            category = category_int_to_str[train_data.pop('category')]
+            input_dataset[category].append(train_data)
 
         return input_dataset
 
@@ -66,6 +65,8 @@ class BaseNet(BasePlugin):
         # download dataset
         self.log_message(_('학습 데이터셋 준비를 시작합니다.'))
         input_dataset = self.get_input_dataset_for_training(model['code'])
+
+        # convert dataset
 
         # train dataset
         client.update_model(model['code'], {'status': 2})
