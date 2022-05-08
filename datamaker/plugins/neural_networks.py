@@ -55,14 +55,23 @@ class BaseNet(BasePlugin):
 
     def get_input_dataset_for_training(self, model_code):
         """
-
         :param model_code:
         :return:
         {
             "train": [
                 {
                     "files": {
-                        "image": "/path/to/image.jpg"
+                        "image": {
+                            "url": "https://datamaker.io/media/path/to/image.jpg",
+                            "path": "/path/to/image.jpg",
+                            "meta": {
+                                "width": 265,
+                                "height": 190,
+                                "created": 1651563526.0277045,
+                                "file_size": 5191,
+                                "last_modified": 1651563526.0277045
+                            }
+                        }
                     },
                     "ground_truth": {
                         ...label_data
@@ -78,7 +87,7 @@ class BaseNet(BasePlugin):
         assert bool(client)
 
         category_int_to_str = {1: 'train', 2: 'validation', 3: 'test'}
-        input_dataset = {'train': [], 'validation': [], 'test': []}
+        input_dataset = {}
 
         train_dataset, count_dataset = client.list_train_dataset(
             payload={
@@ -91,7 +100,10 @@ class BaseNet(BasePlugin):
         for i, train_data in enumerate(train_dataset, start=1):
             self.set_progress(i, count_dataset, category='dataset_download')
             category = category_int_to_str[train_data.pop('category')]
-            input_dataset[category].append(train_data)
+            try:
+                input_dataset[category].append(train_data)
+            except KeyError:
+                input_dataset[category] = [train_data]
 
         return input_dataset
 
