@@ -1,3 +1,4 @@
+import copy
 from pathlib import Path
 
 from django.utils.translation import gettext as _
@@ -11,10 +12,25 @@ LOADED_MODELS = {}
 
 class BaseNet(BasePlugin):
     # TODO implement specifying which hardware to use (gpu-n, cpu)
+    """
+    input_dataset_conversion = {
+        "plugin": "coco",
+        "configuration": {}
+    }
+    """
 
-    model = None
+    # attributes to override
+    input_dataset_conversion = None
     input_schema = None
+
+    # attributes for internal use
+    model = None
     count_iterations = None
+    export_plugin_class = None
+
+    def __init__(self, export_plugin_class=None, **kwargs):
+        self.export_plugin_class = export_plugin_class
+        super().__init__(**kwargs)
 
     def set_model(self, model):
         self.model = model
@@ -38,6 +54,26 @@ class BaseNet(BasePlugin):
                 download_file(url, path_download, name=str(input_data['id']))
 
     def get_input_dataset_for_training(self, model_code):
+        """
+
+        :param model_code:
+        :return:
+        {
+            "train": [
+                {
+                    "files": {
+                        "image": "/path/to/image.jpg"
+                    },
+                    "ground_truth": {
+                        ...label_data
+                    }
+                },
+                ...
+            ],
+            "validation": ...,
+            "test": ...
+        }
+        """
         client = self.logger.client
         assert bool(client)
 
@@ -59,6 +95,23 @@ class BaseNet(BasePlugin):
 
         return input_dataset
 
+    def convert_dataset(self, input_dataset):
+        input_dataset_converted = {}
+
+        for category, dataset in input_dataset.items():
+            configuration = copy.deepcopy(self.input_dataset_conversion['configuration'])
+            configuration.update({
+                'name': category,
+                'export_root': str(self.get_model_base_path())
+            })
+            export_plugin = self.export_plugin_class(
+                dataset, len(dataset), configuration,
+                logger=self.logger, progress_prefix=category
+            )
+            input_dataset_converted[category] = export_plugin.export()
+
+        return input_dataset_converted
+
     def run_train(self, model, **kwargs):
         client = self.logger.client
         assert bool(client)
@@ -70,6 +123,9 @@ class BaseNet(BasePlugin):
         input_dataset = self.get_input_dataset_for_training(model['code'])
 
         # convert dataset
+        self.log_message(_('학습 데이터셋 포맷 변환을 시작합니다.'))
+        if self.input_dataset_conversion:
+            input_dataset = self.convert_dataset(input_dataset)
 
         # train dataset
         client.update_model(model['code'], {'status': 2})
@@ -116,27 +172,6 @@ class BaseNet(BasePlugin):
         raise NotImplementedError
 
     def train(self, input_dataset, hyperparameter, checkpoint=None):
-        """
-        :param input_dataset:
-        {
-            "train": [
-                {
-                    "files": {
-                        "image": "/path/to/image.jpg"
-                    },
-                    "ground_truth": {
-                        ...label_data
-                    }
-                },
-                ...
-            ],
-            "validation": ...,
-            "test": ...
-        }
-        :param hyperparameter:
-        :param checkpoint:
-        :return:
-        """
         raise NotImplementedError
 
     def test(self, ground_truth, prediction):

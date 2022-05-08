@@ -4,7 +4,7 @@ from functools import reduce
 from pathlib import Path
 
 import requests
-from django.conf import settings
+from constance import config
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 
@@ -15,10 +15,10 @@ def download_file(url, path_download, name=None, coerce=None):
     else:
         name = Path(url).name
 
-    media_url = os.path.join(settings.DATAMAKER_HOST, 'media/')
+    media_url = os.path.join(config.BACKEND_HOST, 'media/')
 
-    if url.startswith(media_url):
-        path = Path(settings.DATAMAKER_MEDIA_ROOT) / url.replace(media_url, '')
+    if config.MEDIA_ROOT and url.startswith(media_url):
+        path = Path(config.MEDIA_ROOT) / url.replace(media_url, '')
     else:
         path = path_download / name
         if not path.is_file():
@@ -30,7 +30,7 @@ def download_file(url, path_download, name=None, coerce=None):
 
 
 def files_url_to_path(files, coerce=None):
-    path_download = Path('/tmp/agent/media')
+    path_download = Path(config.TEMP_ROOT) / 'media'
     path_download.mkdir(parents=True, exist_ok=True)
     for file_name in files:
         url = files[file_name]
@@ -56,3 +56,9 @@ def get_file_from_url(url):
     file.write(r.content)
     file.flush()
     return File(file, name=Path(url).name)
+
+
+def json_default(value):
+    if isinstance(value, Path):
+        return str(value)
+    raise TypeError

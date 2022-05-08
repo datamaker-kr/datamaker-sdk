@@ -91,7 +91,7 @@ class Client(*mixins):
         if list_all:
             return self._list_all(path, payload, url_conversion), response['count']
         else:
-            return response['results'], response['count']
+            return response
 
     def _list_all(self, path, payload=None, url_conversion=None):
         response = self._get(path, payload, url_conversion)

@@ -3,6 +3,14 @@ from ..utils import get_default_url_conversion
 
 class AnnotationClientMixin:
 
+    def get_label_tag(self, pk):
+        path = f'label_tags/{pk}/'
+        return self._get(path)
+
+    def list_label_tags(self, payload=None):
+        path = 'label_tags/'
+        return self._list(path, payload)
+
     def list_labels(self, payload=None, url_conversion=None, list_all=False):
         path = 'labels/'
         url_conversion = get_default_url_conversion(url_conversion, files_fields=['files'])
