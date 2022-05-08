@@ -62,7 +62,6 @@ class BaseNet(BasePlugin):
                 {
                     "files": {
                         "image": {
-                            "url": "https://datamaker.io/media/path/to/image.jpg",
                             "path": "/path/to/image.jpg",
                             "meta": {
                                 "width": 265,
