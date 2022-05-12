@@ -150,6 +150,7 @@ class BaseNet(BasePlugin):
         self.log_message(_('학습된 모델을 업로드 합니다.'))
         client.update_model(model['code'], {'status': 3}, files=model_files)
 
+        self.end_log()
         return {}
 
     def run_test(self, input_dataset, **kwargs):

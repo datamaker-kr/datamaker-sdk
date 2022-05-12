@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from constance import config
+from django.utils.translation import gettext as _
 from nanoid import generate
 
 from datamaker.utils.logger import Logger
@@ -31,3 +32,6 @@ class BasePlugin:
 
     def log_message(self, message):
         self.logger.log('message', {'content': message})
+
+    def end_log(self):
+        self.log_message(_('작업이 완료되었습니다.'))
