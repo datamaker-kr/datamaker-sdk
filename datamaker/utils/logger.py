@@ -45,7 +45,7 @@ class Logger:
             try:
                 self.client.create_logs(self.logs_queue)
                 self.logs_queue.clear()
-            except ClientError:
-                pass
+            except ClientError as e:
+                print(e)
         else:
             print(log)
