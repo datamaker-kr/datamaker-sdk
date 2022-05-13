@@ -22,6 +22,9 @@ class BaseExport(BasePlugin):
         self.base_path = Path(export_root) / configuration['name']
         self.base_path.mkdir(parents=True)
 
+    def get_classification(self):
+        return self.configuration['classification']
+
     def convert_data(self, data):
         raise NotImplementedError
 

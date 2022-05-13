@@ -3,6 +3,10 @@ from ..utils import get_default_url_conversion
 
 class AnnotationClientMixin:
 
+    def get_project(self, pk):
+        path = f'projects/{pk}/'
+        return self._get(path)
+
     def get_label_tag(self, pk):
         path = f'label_tags/{pk}/'
         return self._get(path)
