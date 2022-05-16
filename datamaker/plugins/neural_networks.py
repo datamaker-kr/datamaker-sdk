@@ -36,13 +36,13 @@ class BaseNet(BasePlugin):
         self.model = model
 
     def get_loaded_model(self):
-        with lock(f'model_load_{self.model["code"]}'):
-            if self.model['code'] not in LOADED_MODELS:
-                LOADED_MODELS[self.model['code']] = self.load_model()
-        return LOADED_MODELS[self.model['code']]
+        with lock(f'model_load_{self.model["id"]}'):
+            if self.model['id'] not in LOADED_MODELS:
+                LOADED_MODELS[self.model['id']] = self.load_model()
+        return LOADED_MODELS[self.model['id']]
 
     def get_model_base_path(self):
-        return self.base_path / Path(self.model['code'])
+        return self.base_path / Path(f'model_{self.model["id"]}')
 
     def download_dataset(self, input_dataset, download_path_map):
         base_path = self.get_model_base_path()
@@ -53,9 +53,9 @@ class BaseNet(BasePlugin):
                 path_download.mkdir(parents=True, exist_ok=True)
                 download_file(url, path_download, name=str(input_data['id']))
 
-    def get_input_dataset_for_training(self, model_code):
+    def get_input_dataset_for_training(self, model_id):
         """
-        :param model_code:
+        :param model_id:
         :return:
         {
             "train": [
@@ -91,7 +91,7 @@ class BaseNet(BasePlugin):
         train_dataset, count_dataset = client.list_train_dataset(
             payload={
                 'fields': ['category', 'files', 'ground_truth'],
-                'model': model_code
+                'model': model_id
             },
             list_all=True
         )
@@ -140,7 +140,7 @@ class BaseNet(BasePlugin):
 
         # download dataset
         self.log_message(_('학습 데이터셋 준비를 시작합니다.'))
-        input_dataset = self.get_input_dataset_for_training(model['code'])
+        input_dataset = self.get_input_dataset_for_training(model['id'])
 
         # convert dataset
         self.log_message(_('학습 데이터셋 포맷 변환을 시작합니다.'))
@@ -148,7 +148,7 @@ class BaseNet(BasePlugin):
             input_dataset = self.convert_dataset(model, input_dataset)
 
         # train dataset
-        client.update_model(model['code'], {'status': 2})
+        client.update_model(model['id'], {'status': 2})
         self.log_message(_('모델 학습을 시작합니다.'))
         model_files = self.train(
             input_dataset, model['configuration']['hyperparameter'],
@@ -157,7 +157,7 @@ class BaseNet(BasePlugin):
 
         # upload model_data
         self.log_message(_('학습된 모델을 업로드 합니다.'))
-        client.update_model(model['code'], {'status': 3}, files=model_files)
+        client.update_model(model['id'], {'status': 3}, files=model_files)
 
         self.end_log()
         return {}
