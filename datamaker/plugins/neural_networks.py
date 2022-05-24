@@ -113,7 +113,7 @@ class BaseNet(BasePlugin):
         input_dataset_converted = {}
         project = client.get_project(model['configuration']['dataset']['project'])
         try:
-            classification = project['configuration']['annotation_config']['dm_schema']
+            classification = project['configuration']['classification']
         except KeyError:
             classification = None
 
