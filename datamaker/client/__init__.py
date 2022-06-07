@@ -14,15 +14,11 @@ from .mixins.dataset import DatasetClientMixin
 from .mixins.integration import IntegrationClientMixin
 from .mixins.ml import MLClientMixin
 
-mixins = (
-    AnnotationClientMixin,
-    DatasetClientMixin,
-    IntegrationClientMixin,
-    MLClientMixin,
-)
 
-
-class Client(*mixins):
+class Client(AnnotationClientMixin,
+             DatasetClientMixin,
+             IntegrationClientMixin,
+             MLClientMixin):
     base_url = None
     token = None
     workspace_code = None
