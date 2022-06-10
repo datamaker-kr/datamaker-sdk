@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from ..utils import get_batched_list
 
 
 class DatasetClientMixin:
@@ -15,7 +16,7 @@ class DatasetClientMixin:
         path = 'data_units/'
         return self._post(path, payload=data)
 
-    def import_dataset(self, dataset_id, dataset, project_id=None):
+    def import_dataset(self, dataset_id, dataset, project_id=None, batch_size=1000):
 
         # TODO validate datset with schema
 
@@ -28,18 +29,21 @@ class DatasetClientMixin:
                     'path': str(path)
                 }
 
-        data_units = self.create_data_units(dataset)
+        batches = get_batched_list(dataset, batch_size)
 
-        if project_id:
-            labels_data = []
-            for data, data_unit in zip(dataset, data_units):
-                label_data = {
-                    'project': project_id,
-                    'data_unit': data_unit['id']
-                }
-                if 'ground_truth' in data:
-                    label_data['ground_truth'] = data['ground_truth']
+        for batch in batches:
+            data_units = self.create_data_units(batch)
 
-                labels_data.append(label_data)
+            if project_id:
+                labels_data = []
+                for data, data_unit in zip(batch, data_units):
+                    label_data = {
+                        'project': project_id,
+                        'data_unit': data_unit['id']
+                    }
+                    if 'ground_truth' in data:
+                        label_data['ground_truth'] = data['ground_truth']
 
-            self.create_labels(labels_data)
+                    labels_data.append(label_data)
+
+                self.create_labels(labels_data)
