@@ -1,5 +1,5 @@
 from tqdm import tqdm
-from ..utils import dataset_batch
+from ..utils import get_batched_list
 
 
 class DatasetClientMixin:
@@ -29,9 +29,9 @@ class DatasetClientMixin:
                     'path': str(path)
                 }
 
-        batch_dataset = dataset_batch(dataset, batch_size)
+        batches = get_batched_list(dataset, batch_size)
 
-        for batch in batch_dataset:
+        for batch in batches:
             data_units = self.create_data_units(batch)
 
             if project_id:

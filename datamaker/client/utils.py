@@ -10,5 +10,5 @@ def get_default_url_conversion(url_conversion, **kwargs):
     return defaults
 
 
-def dataset_batch(dataset, batch_size):
-    return [dataset[data:data + batch_size] for data in range(0, len(dataset), batch_size)]
+def get_batched_list(object_list, batch_size):
+    return [object_list[index:index + batch_size] for index in range(0, len(object_list), batch_size)]
