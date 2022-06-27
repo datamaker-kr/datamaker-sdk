@@ -31,7 +31,7 @@ class DatasetClientMixin:
 
         batches = get_batched_list(dataset, batch_size)
 
-        for batch in batches:
+        for batch in tqdm(batches):
             data_units = self.create_data_units(batch)
 
             if project_id:
