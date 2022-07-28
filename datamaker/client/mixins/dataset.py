@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 from tqdm import tqdm
 from ..utils import get_batched_list
 
@@ -16,18 +17,13 @@ class DatasetClientMixin:
         path = 'data_units/'
         return self._post(path, payload=data)
 
-    def import_dataset(self, dataset_id, dataset, project_id=None, batch_size=1000):
-
+    def import_dataset(self, dataset_id, dataset, project_id=None, batch_size=1000, process_pool=10):
         # TODO validate datset with schema
 
-        for data in tqdm(dataset):
-            for name, path in data['files'].items():
-                data_file = self.create_data_file(path)
-                data['dataset'] = dataset_id
-                data['files'][name] = {
-                    'checksum': data_file['checksum'],
-                    'path': str(path)
-                }
+        params = [(data, dataset_id) for data in dataset]
+
+        with Pool(processes=process_pool) as pool:
+            dataset = pool.starmap(self.import_data_file, tqdm(params))
 
         batches = get_batched_list(dataset, batch_size)
 
@@ -47,3 +43,13 @@ class DatasetClientMixin:
                     labels_data.append(label_data)
 
                 self.create_labels(labels_data)
+
+    def import_data_file(self, data, dataset_id):
+        for name, path in data['files'].items():
+            data_file = self.create_data_file(path)
+            data['dataset'] = dataset_id
+            data['files'][name] = {
+                'checksum': data_file['checksum'],
+                'path': str(path)
+            }
+        return data
