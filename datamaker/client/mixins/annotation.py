@@ -24,6 +24,10 @@ class AnnotationClientMixin:
         path = 'labels/'
         return self._post(path, payload=data)
 
+    def create_label_tags(self, data):
+        path = 'label_tags/'
+        return self._post(path, payload=data)
+
     def set_tags_labels(self, data, params=None):
         path = 'labels/set_tags/'
         return self._post(path, payload=data, params=params)
