@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  build-n-publish:
 
     runs-on: self-hosted
 
@@ -33,7 +33,7 @@ jobs:
         pip install build
     - name: Build package
       run: python -m build
-    - name: Remove old dist
+    - name: Skip old dist
       run: twine upload --skip-existing dist/*
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1
