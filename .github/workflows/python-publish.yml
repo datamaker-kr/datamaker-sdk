@@ -34,7 +34,9 @@ jobs:
     - name: Build package
       run: python -m build
     - name: Skip old dist
-      run: python3 -m twine upload --skip-existing dist/*
+      run: |
+        pip install twine
+        python3 -m twine upload --skip-existing dist/*
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
