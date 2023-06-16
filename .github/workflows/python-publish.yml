@@ -27,6 +27,8 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     # retrieve your distributions here
+    - name: setup dist
+      run: python setup.py sdist
     - name: skip old dist
       run: |
         pip install twine
