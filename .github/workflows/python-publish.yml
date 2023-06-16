@@ -27,8 +27,9 @@ jobs:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     # retrieve your distributions here
-    - name: Re-create the wheels
+    - name: skip old dist
       run: |
-        python3 setup.py sdist bdist_wheel
+        pip install twine
+        python -m twine upload --skip-existing dist/*
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
