@@ -11,6 +11,10 @@ class DatasetClientMixin:
         path = 'datasets/'
         return self._get(path)
 
+    def get_data_unit(self, pk):
+        path = f'data_units/{pk}'
+        return self._get(path)
+
     def create_data_file(self, file_path):
         path = 'data_files/'
         return self._post(path, files={'file': file_path})
