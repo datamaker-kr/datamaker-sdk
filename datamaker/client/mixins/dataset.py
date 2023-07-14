@@ -12,7 +12,7 @@ class DatasetClientMixin:
         return self._get(path)
 
     def get_data_unit(self, pk):
-        path = f'data_units/{pk}'
+        path = f'data_units/{pk}/'
         return self._get(path)
 
     def create_data_file(self, file_path):
