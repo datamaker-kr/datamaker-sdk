@@ -11,14 +11,14 @@ from ..utils.file import files_url_to_path_from_objs
 from .exceptions import ClientError
 from .mixins.annotation import AnnotationClientMixin
 from .mixins.dataset import DatasetClientMixin
-from .mixins.hitl import HumanInTheLoopClientMixin
+from .mixins.hitl import HITLClientMixin
 from .mixins.integration import IntegrationClientMixin
 from .mixins.ml import MLClientMixin
 
 
 class Client(AnnotationClientMixin,
              DatasetClientMixin,
-             HumanInTheLoopClientMixin,
+             HITLClientMixin,
              IntegrationClientMixin,
              MLClientMixin):
     base_url = None

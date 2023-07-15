@@ -1,4 +1,4 @@
-class HumanInTheLoopClientMixin:
+class HITLClientMixin:
 
     def get_assignment(self, pk):
         path = f'assignments/{pk}/'
