@@ -63,7 +63,8 @@ class Client(
             response = getattr(self.requests_session, method)(url, headers=headers, **kwargs)
             if not response.ok:
                 raise ClientError(
-                    response.status_code, response.json() if response.status_code == 400 else response.reason
+                    response.status_code,
+                    response.json() if response.status_code == 400 else response.reason,
                 )
         except requests.ConnectionError:
             raise ClientError(408, _('서버가 응답하지 않습니다.'))
