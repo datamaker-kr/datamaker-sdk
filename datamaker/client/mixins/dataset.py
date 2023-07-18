@@ -6,7 +6,6 @@ from ..utils import get_batched_list
 
 
 class DatasetClientMixin:
-
     def list_dataset(self):
         path = 'datasets/'
         return self._get(path)
@@ -65,18 +64,20 @@ class DatasetClientMixin:
             if batch_sequential:
                 for data, data_unit in zip(batch_sequential, data_units):
                     for name, files in data.items():
-                        self.create_data_unit_files({
-                            'data_unit': data_unit['id'],
-                            'name': name,
-                            'files': files
-                        })
+                        self.create_data_unit_files(
+                            {
+                                'data_unit': data_unit['id'],
+                                'name': name,
+                                'files': files,
+                            }
+                        )
 
             if project_id:
                 labels_data = []
                 for data, data_unit in zip(batch, data_units):
                     label_data = {
                         'project': project_id,
-                        'data_unit': data_unit['id']
+                        'data_unit': data_unit['id'],
                     }
                     if 'ground_truth' in data:
                         label_data['ground_truth'] = data['ground_truth']
@@ -96,7 +97,7 @@ class DatasetClientMixin:
                     file = {
                         'checksum': data_file['checksum'],
                         'path': str(path),
-                        'index': i
+                        'index': i,
                     }
                     result['files'][name].append(file)
             else:
@@ -105,6 +106,6 @@ class DatasetClientMixin:
                 result['dataset'] = dataset_id
                 result['files'][name] = {
                     'checksum': data_file['checksum'],
-                    'path': str(path)
+                    'path': str(path),
                 }
         return result

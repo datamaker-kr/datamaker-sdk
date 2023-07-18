@@ -1,5 +1,4 @@
 class HITLClientMixin:
-
     def get_assignment(self, pk):
         path = f'assignments/{pk}/'
         return self._get(path)

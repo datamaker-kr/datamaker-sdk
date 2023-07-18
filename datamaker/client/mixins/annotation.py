@@ -2,7 +2,6 @@ from ..utils import get_default_url_conversion
 
 
 class AnnotationClientMixin:
-
     def get_project(self, pk):
         path = f'projects/{pk}/'
         return self._get(path)

@@ -2,12 +2,12 @@ from ..utils import get_default_url_conversion
 
 
 class MLClientMixin:
-
     def get_model(self, pk, payload=None, url_conversion=None):
         path = f'models/{pk}/'
         url_conversion = get_default_url_conversion(
             url_conversion,
-            files_fields=['files', 'parent.files'], is_list=False
+            files_fields=['files', 'parent.files'],
+            is_list=False,
         )
         return self._get(path, payload, url_conversion)
 

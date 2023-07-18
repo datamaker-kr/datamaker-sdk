@@ -1,5 +1,4 @@
 class IntegrationClientMixin:
-
     def get_plugin(self, pk):
         path = f'plugins/{pk}/'
         return self._get(path)

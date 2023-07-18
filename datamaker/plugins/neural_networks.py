@@ -91,9 +91,9 @@ class BaseNet(BasePlugin):
         train_dataset, count_dataset = client.list_train_dataset(
             payload={
                 'fields': ['category', 'files', 'ground_truth'],
-                'model': model_id
+                'model': model_id,
             },
-            list_all=True
+            list_all=True,
         )
 
         for i, train_data in enumerate(train_dataset, start=1):
@@ -119,14 +119,19 @@ class BaseNet(BasePlugin):
 
         for category, dataset in input_dataset.items():
             configuration = copy.deepcopy(self.input_dataset_conversion['configuration'])
-            configuration.update({
-                'name': category,
-                'classification': classification,
-                'export_root': str(self.get_model_base_path())
-            })
+            configuration.update(
+                {
+                    'name': category,
+                    'classification': classification,
+                    'export_root': str(self.get_model_base_path()),
+                }
+            )
             export_plugin = self.export_plugin_class(
-                dataset, len(dataset), configuration,
-                logger=self.logger, progress_prefix=category
+                dataset,
+                len(dataset),
+                configuration,
+                logger=self.logger,
+                progress_prefix=category,
             )
             input_dataset_converted[category] = export_plugin.export()
 
@@ -151,8 +156,9 @@ class BaseNet(BasePlugin):
         client.update_model(model['id'], {'status': 2})
         self.log_message(_('모델 학습을 시작합니다.'))
         model_files = self.train(
-            input_dataset, model['configuration']['hyperparameter'],
-            checkpoint=model['parent']
+            input_dataset,
+            model['configuration']['hyperparameter'],
+            checkpoint=model['parent'],
         )
 
         # upload model_data
