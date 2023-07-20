@@ -4,4 +4,10 @@ on: [push, pull_request]
 
 jobs:
   lint:
-    uses: datamaker-kr/workflow/.github/workflows/lint-python.yml@main
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
+      - uses: chartboost/ruff-action@v1
+        with:
+          version: 0.0.272
