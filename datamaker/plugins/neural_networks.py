@@ -118,7 +118,9 @@ class BaseNet(BasePlugin):
             classification = None
 
         for category, dataset in input_dataset.items():
-            configuration = copy.deepcopy(self.input_dataset_conversion['configuration'])
+            configuration = copy.deepcopy(
+                self.input_dataset_conversion['configuration']
+            )
             configuration.update(
                 {
                     'name': category,

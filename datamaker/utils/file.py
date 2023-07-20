@@ -34,9 +34,13 @@ def files_url_to_path(files, coerce=None):
     path_download.mkdir(parents=True, exist_ok=True)
     for file_name in files:
         if isinstance(files[file_name], str):
-            files[file_name] = download_file(files[file_name], path_download, coerce=coerce)
+            files[file_name] = download_file(
+                files[file_name], path_download, coerce=coerce
+            )
         else:
-            files[file_name]['path'] = download_file(files[file_name].pop('url'), path_download, coerce=coerce)
+            files[file_name]['path'] = download_file(
+                files[file_name].pop('url'), path_download, coerce=coerce
+            )
 
 
 def files_url_to_path_from_objs(objs, files_fields, coerce=None, is_list=False):

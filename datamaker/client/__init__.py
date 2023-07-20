@@ -60,7 +60,9 @@ class Client(
                     kwargs['data'] = json.dumps(kwargs['data'])
 
         try:
-            response = getattr(self.requests_session, method)(url, headers=headers, **kwargs)
+            response = getattr(self.requests_session, method)(
+                url, headers=headers, **kwargs
+            )
             if not response.ok:
                 raise ClientError(
                     response.status_code,

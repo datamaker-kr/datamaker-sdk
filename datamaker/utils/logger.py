@@ -36,7 +36,9 @@ class Logger:
         log = {
             'action': action,
             'data': data,
-            'datetime': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S.%f'),
+            'datetime': timezone.localtime(timezone.now()).strftime(
+                '%Y-%m-%d %H:%M:%S.%f'
+            ),
         }
 
         if self.client and self.task:

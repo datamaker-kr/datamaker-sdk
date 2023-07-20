@@ -21,5 +21,7 @@ class MLClientMixin:
 
     def list_train_dataset(self, payload=None, url_conversion=None, list_all=False):
         path = 'train_dataset/'
-        url_conversion = get_default_url_conversion(url_conversion, files_fields=['files'])
+        url_conversion = get_default_url_conversion(
+            url_conversion, files_fields=['files']
+        )
         return self._list(path, payload, url_conversion, list_all)
