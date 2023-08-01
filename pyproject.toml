@@ -7,3 +7,14 @@ requires = [
 build-backend = 'setuptools.build_meta'
 
 [tool.setuptools_scm]
+
+[tool.ruff]
+select = ['E', 'F', 'Q']
+
+[tool.ruff.flake8-quotes]
+inline-quotes = 'single'
+
+[tool.black]
+target-version = ['py311']
+skip-string-normalization = true
+preview = true

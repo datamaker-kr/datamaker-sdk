@@ -22,12 +22,12 @@ class Logger:
         self.progress_records[category] = {
             'current': current,
             'total': total,
-            'percent': percent
+            'percent': percent,
         }
         if self.task:
             self.task.update_state(
                 state='PROGRESS',
-                meta=self.progress_records
+                meta=self.progress_records,
             )
         else:
             print(self.progress_records)
@@ -36,7 +36,9 @@ class Logger:
         log = {
             'action': action,
             'data': data,
-            'datetime': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S.%f')
+            'datetime': timezone.localtime(timezone.now()).strftime(
+                '%Y-%m-%d %H:%M:%S.%f'
+            ),
         }
 
         if self.client and self.task:

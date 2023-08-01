@@ -16,11 +16,13 @@ from .mixins.integration import IntegrationClientMixin
 from .mixins.ml import MLClientMixin
 
 
-class Client(AnnotationClientMixin,
-             DatasetClientMixin,
-             HITLClientMixin,
-             IntegrationClientMixin,
-             MLClientMixin):
+class Client(
+    AnnotationClientMixin,
+    DatasetClientMixin,
+    HITLClientMixin,
+    IntegrationClientMixin,
+    MLClientMixin,
+):
     base_url = None
     token = None
     workspace_code = None
@@ -58,11 +60,13 @@ class Client(AnnotationClientMixin,
                     kwargs['data'] = json.dumps(kwargs['data'])
 
         try:
-            response = getattr(self.requests_session, method)(url, headers=headers, **kwargs)
+            response = getattr(self.requests_session, method)(
+                url, headers=headers, **kwargs
+            )
             if not response.ok:
                 raise ClientError(
                     response.status_code,
-                    response.json() if response.status_code == 400 else response.reason
+                    response.json() if response.status_code == 400 else response.reason,
                 )
         except requests.ConnectionError:
             raise ClientError(408, _('서버가 응답하지 않습니다.'))
