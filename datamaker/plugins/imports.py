@@ -25,7 +25,7 @@ class BaseImport(BasePlugin):
         self.groups = groups
         self.batch_size = 500 if not batch_size else batch_size
 
-    # TODO 나중에는 get_pathlib 통해서 가져올 것, 현재는 /mnt/projects/에서 가져온다 가정
+    # TODO 나중에는 get_pathlib 통해서 가져올 것, 현재는 /mnt/projects/에서 가져온다 가정 # noqa E501
     def get_files(self):
         files = {}
         for file_type, extensions in self.allowed_extensions.items():
