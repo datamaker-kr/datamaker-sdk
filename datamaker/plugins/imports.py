@@ -5,8 +5,17 @@ from datamaker.plugins import BasePlugin
 
 
 class BaseImport(BasePlugin):
-    def __init__(self, dataset_id, project_id, storage_id, storage_path, allowed_extensions, groups,
-                 batch_size, **kwargs):
+    def __init__(
+        self,
+        dataset_id,
+        project_id,
+        storage_id,
+        storage_path,
+        allowed_extensions,
+        groups,
+        batch_size,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.dataset_id = dataset_id
         self.project_id = project_id
@@ -22,9 +31,14 @@ class BaseImport(BasePlugin):
         for file_type, extensions in self.allowed_extensions.items():
             files[file_type] = []
             for extension in extensions:
-                paths_image = Path(f'/mnt/projects/{self.storage_path}').rglob(f'*.{extension}')
+                paths_image = Path(f'/mnt/projects/{self.storage_path}').rglob(
+                    f'*.{extension}'
+                )
                 for index, path in enumerate(paths_image):
-                    if path.parent.name == '@eaDir' or path.parent.parent.name == '@eaDir':
+                    if (
+                        path.parent.name == '@eaDir'
+                        or path.parent.parent.name == '@eaDir'
+                    ):
                         continue
                     files[file_type].append(path)
         return files
@@ -38,14 +52,9 @@ class BaseImport(BasePlugin):
             files_entry = {key: files[key][i] for key in keys}
 
             if self.groups:
-                entry = {
-                    'files': files_entry,
-                    'groups': self.groups
-                }
+                entry = {'files': files_entry, 'groups': self.groups}
             else:
-                entry = {
-                    'files': files_entry
-                }
+                entry = {'files': files_entry}
             dataset.append(entry)
 
         return dataset
@@ -58,7 +67,7 @@ class BaseImport(BasePlugin):
                 self.dataset_id,
                 dataset,
                 project_id=self.project_id,
-                batch_size=self.batch_size
+                batch_size=self.batch_size,
             )
         except ClientError as e:
             response['status'] = str(e)
