@@ -3,19 +3,23 @@ from datamaker.plugins import BasePlugin
 
 
 class BaseImport(BasePlugin):
-    def get_files(self, allowed_extensions, paths):
+    def get_files(self, storage, paths, allowed_extensions, configuration):
         raise NotImplementedError
 
-    def prepare_dataset(self, storage, paths, **kwargs):
+    def prepare_dataset(self, storage, paths, allowed_extensions, configuration):
         raise NotImplementedError
 
-    def import_dataset(self, project, storage, paths, **kwargs):
+    def import_dataset(self, project, storage, paths, allowed_extensions, **kwargs):
         batch_size = kwargs.get('batch_size', 500)
         project_id = project['id']
         dataset_id = project['dataset']
+        configuration = kwargs['configuration']
 
         response = {'status': 'success'}
-        dataset = self.prepare_dataset(storage, paths, **kwargs)
+
+        dataset = self.prepare_dataset(
+            storage, paths, allowed_extensions, configuration
+        )
         try:
             self.logger.client.import_dataset(
                 dataset_id,
