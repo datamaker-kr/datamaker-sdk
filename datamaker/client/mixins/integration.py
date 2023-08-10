@@ -8,5 +8,9 @@ class IntegrationClientMixin:
         return self._post(path, payload=data)
 
     def create_task(self, data):
-        path = 'agent_tasks/'
+        path = 'tasks/'
         return self._post(path, payload=data)
+
+    def update_task(self, pk, data):
+        path = f'tasks/{pk}/'
+        return self._patch(path, payload=data)
