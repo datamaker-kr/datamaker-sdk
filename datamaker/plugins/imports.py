@@ -1,4 +1,3 @@
-from datamaker.client import ClientError
 from datamaker.plugins import BasePlugin
 
 
@@ -7,57 +6,43 @@ class BaseImport(BasePlugin):
         self,
         category,
         target_id,
-        storage,
+        storage_id,
         paths,
         configuration,
-        batch_size,
         **kwargs,
     ):
+        self.batch_size = kwargs.pop('batch_size')
         super().__init__(**kwargs)
+        self.client = self.logger.client
+        assert bool(self.client)
+
         self.category = category
         self.target_id = target_id
-        self.storage = storage
+        self.storage_id = storage_id
         self.paths = paths
         self.configuration = configuration
-        self.batch_size = batch_size
 
     def prepare_dataset(self, storage, paths, allowed_extensions, configuration):
         raise NotImplementedError
 
     def import_dataset(self):
         if self.category == 'project':
-            dataset_id = self.logger.client.get_project(self.target_id)['dataset']
-            dataset = self.logger.client.get_dataset(dataset_id)
+            project_id = self.target_id
+            dataset_id = self.client.get_project(project_id)['dataset']
         else:
+            project_id = None
             dataset_id = self.target_id
-            dataset = self.logger.client.get_dataset(self.target_id)
 
-        allowed_extensions = {}
-        import_file_names = {
-            data['file_type']: data['name'] for data in dataset['file_specifications']
-        }
-        for key, extensions in dataset['allowed_extensions'].items():
-            new_key = import_file_names.get(key)
-            allowed_extensions[new_key] = extensions
-
-        configuration = self.configuration
+        dataset = self.client.get_dataset(dataset_id)
+        storage = self.client.get_storage(self.storage_id)
+        allowed_extensions = dataset['allowed_extensions']
 
         dataset = self.prepare_dataset(
-            self.storage, self.paths, allowed_extensions, configuration
+            storage, self.paths, allowed_extensions, self.configuration
         )
-        try:
-            if self.category == 'project':
-                self.logger.client.import_dataset(
-                    dataset_id,
-                    dataset,
-                    project_id=self.target_id,
-                    batch_size=self.batch_size,
-                )
-            else:
-                self.logger.client.import_dataset(
-                    dataset_id,
-                    dataset,
-                    batch_size=self.batch_size,
-                )
-        except ClientError as e:
-            raise e
+        self.logger.client.import_dataset(
+            dataset_id,
+            dataset,
+            project_id=project_id,
+            batch_size=self.batch_size,
+        )
