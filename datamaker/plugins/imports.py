@@ -9,9 +9,9 @@ class BaseImport(BasePlugin):
         storage_id,
         paths,
         configuration,
+        batch_size,
         **kwargs,
     ):
-        self.batch_size = kwargs.pop('batch_size')
         super().__init__(**kwargs)
         self.client = self.logger.client
         assert bool(self.client)
@@ -21,6 +21,7 @@ class BaseImport(BasePlugin):
         self.storage_id = storage_id
         self.paths = paths
         self.configuration = configuration
+        self.batch_size = batch_size
 
     def prepare_dataset(self, storage, paths, allowed_extensions, configuration):
         raise NotImplementedError
@@ -40,7 +41,7 @@ class BaseImport(BasePlugin):
         dataset = self.prepare_dataset(
             storage, self.paths, allowed_extensions, self.configuration
         )
-        self.logger.client.import_dataset(
+        self.client.import_dataset(
             dataset_id,
             dataset,
             project_id=project_id,
