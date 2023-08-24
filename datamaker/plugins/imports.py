@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from datamaker.plugins import BasePlugin
 
 
@@ -35,7 +37,7 @@ class BaseImport(BasePlugin):
             dataset_id = self.target_id
 
         dataset = self.client.get_dataset(dataset_id)
-        storage = self.client.get_storage(self.storage_id)
+        storage = self.get_storage()
         allowed_extensions = dataset['allowed_extensions']
 
         dataset = self.prepare_dataset(
@@ -47,3 +49,19 @@ class BaseImport(BasePlugin):
             project_id=project_id,
             batch_size=self.batch_size,
         )
+
+    def get_storage(self):
+        # TODO support multiple storages
+        class FileSystemStorage:
+            def __init__(self, location):
+                self.location = location
+
+            def get_pathlib(self):
+                return Path(self.location)
+
+        storage = self.client.get_storage(self.storage_id)
+        assert (
+            storage['provider'] == 'file_system'
+            and 'location' in storage['configuration']
+        )
+        return FileSystemStorage(storage['configuration']['location'])
