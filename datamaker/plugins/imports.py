@@ -9,7 +9,7 @@ class BaseImport(BasePlugin):
         storage_id,
         paths,
         configuration,
-        batch_size,
+        batch_size=500,
         **kwargs,
     ):
         super().__init__(**kwargs)
