@@ -14,3 +14,7 @@ class IntegrationClientMixin:
     def update_task(self, pk, data):
         path = f'tasks/{pk}/'
         return self._patch(path, payload=data)
+
+    def get_storage(self, pk, params=None):
+        path = f'storages/{pk}/'
+        return self._get(path, payload=params)
