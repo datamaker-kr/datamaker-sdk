@@ -67,6 +67,11 @@ class DatasetClientMixin:
                         data['meta'] = {'max_index': max_index}
                     batch_sequential.append(data_sequential)
 
+            # sequential 데이터에 대한 데이터 유닛 checksum 계산 방식 변경
+            for dict_sequential in batch_sequential:
+                for item_name, item_list in dict_sequential.items():
+                    batch[0]['files'][item_name] = item_list[0]
+
             data_units = self.create_data_units(batch)
 
             if batch_sequential:
