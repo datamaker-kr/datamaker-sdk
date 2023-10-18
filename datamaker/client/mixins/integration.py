@@ -18,3 +18,11 @@ class IntegrationClientMixin:
     def get_storage(self, pk, params=None):
         path = f'storages/{pk}/'
         return self._get(path, payload=params)
+
+    def get_script(self, pk, params=None):
+        path = f'scripts/{pk}/'
+        return self._get(path, payload=params)
+
+    def list_scripts(self, payload=None, list_all=False):
+        path = 'scripts/'
+        return self._list(path, payload=payload, list_all=list_all)
