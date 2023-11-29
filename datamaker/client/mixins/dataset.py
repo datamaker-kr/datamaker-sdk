@@ -72,13 +72,11 @@ class DatasetClientMixin:
             if batch_sequential:
                 for data, data_unit in zip(batch_sequential, data_units):
                     for name, files in data.items():
-                        self.create_data_unit_files(
-                            {
-                                'data_unit': data_unit['id'],
-                                'name': name,
-                                'files': files,
-                            }
-                        )
+                        self.create_data_unit_files({
+                            'data_unit': data_unit['id'],
+                            'name': name,
+                            'files': files,
+                        })
 
             if project_id:
                 labels_data = []

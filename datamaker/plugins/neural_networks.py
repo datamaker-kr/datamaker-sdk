@@ -121,13 +121,11 @@ class BaseNet(BasePlugin):
             configuration = copy.deepcopy(
                 self.input_dataset_conversion['configuration']
             )
-            configuration.update(
-                {
-                    'name': category,
-                    'classification': classification,
-                    'export_root': str(self.get_model_base_path()),
-                }
-            )
+            configuration.update({
+                'name': category,
+                'classification': classification,
+                'export_root': str(self.get_model_base_path()),
+            })
             export_plugin = self.export_plugin_class(
                 dataset,
                 len(dataset),
