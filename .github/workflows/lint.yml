@@ -1,7 +1,6 @@
 name: Python Lint
 
-on:
-  workflow_call:
+on: [push, pull_request]
 
 jobs:
   lint:
