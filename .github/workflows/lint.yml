@@ -1,7 +1,11 @@
-name: Lint
+name: Python Lint
 
-on: [push, pull_request]
+on:
+  workflow_call:
 
 jobs:
   lint:
-    uses: datamaker-kr/workflow/.github/workflows/lint-python.yml@main
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+      - uses: chartboost/ruff-action@v1
