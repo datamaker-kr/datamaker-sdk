@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   lint:
-    runs-on: self-hosted
+    runs-on: runner-set
     steps:
       - uses: actions/checkout@v3
       - uses: chartboost/ruff-action@v1

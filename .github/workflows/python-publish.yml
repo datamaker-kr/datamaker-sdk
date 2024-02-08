@@ -19,7 +19,7 @@ permissions:
 jobs:
   deploy:
 
-    runs-on: self-hosted
+    runs-on: runner-set
 
     steps:
     - uses: actions/checkout@v3
