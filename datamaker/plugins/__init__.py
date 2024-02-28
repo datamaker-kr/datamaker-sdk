@@ -11,6 +11,7 @@ class BasePlugin:
     base_path = None
     logger = None
     progress_prefix = ''
+    input_schema = None
 
     def __init__(self, logger=None, progress_prefix=None):
         self.base_path = Path(config.TEMP_ROOT) / 'service_executions' / generate()
@@ -35,3 +36,6 @@ class BasePlugin:
 
     def end_log(self):
         self.log_message(_('작업이 완료되었습니다.'))
+
+    def get_input_schema(self):
+        return self.input_schema
