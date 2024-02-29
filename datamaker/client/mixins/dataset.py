@@ -61,6 +61,9 @@ class DatasetClientMixin:
                                 file
                             ), 'The number of files must be the same.'
 
+                for name in names_to_remove:
+                    del data['files'][name]
+
                 if data_sequential:
                     try:
                         data['meta']['max_index'] = max_index
