@@ -61,10 +61,6 @@ class DatasetClientMixin:
                                 file
                             ), 'The number of files must be the same.'
 
-                # sequential 데이터의 경우 첫 파일이 체크섬 계산에 포함되도록 처리
-                for name in names_to_remove:
-                    data['files'][name] = data['files'][name][0]
-
                 if data_sequential:
                     try:
                         data['meta']['max_index'] = max_index
@@ -82,6 +78,8 @@ class DatasetClientMixin:
                             'name': name,
                             'files': files,
                         })
+                    # update checksum
+                    self.calculate_checksum(data_unit['id'])
 
             if project_id:
                 labels_data = []
