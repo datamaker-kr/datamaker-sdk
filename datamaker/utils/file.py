@@ -7,13 +7,15 @@ import requests
 from constance import config
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
+from datamaker.utils.string import remove_query_string
 
 
 def download_file(url, path_download, name=None, coerce=None):
+    url_parsed = Path(remove_query_string(url))
     if name:
-        name += Path(url).suffix
+        name += url_parsed.suffix
     else:
-        name = Path(url).name
+        name = url_parsed.name
 
     media_url = os.path.join(config.BACKEND_HOST, 'media/')
 
@@ -61,7 +63,7 @@ def get_file_from_url(url):
     file = NamedTemporaryFile(delete=True)
     file.write(r.content)
     file.flush()
-    return File(file, name=Path(url).name)
+    return File(file, name=Path(remove_query_string(url)).name)
 
 
 def json_default(value):
