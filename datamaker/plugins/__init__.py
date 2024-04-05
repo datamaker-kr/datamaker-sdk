@@ -37,5 +37,6 @@ class BasePlugin:
     def end_log(self):
         self.log_message(_('작업이 완료되었습니다.'))
 
-    def get_input_schema(self):
-        return self.input_schema
+    @classmethod
+    def get_input_schema(cls):
+        return cls.input_schema
