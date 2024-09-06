@@ -53,7 +53,10 @@ class Client(
         if method in ['post', 'put', 'patch']:
             if kwargs.get('files') is not None:
                 for name, file in kwargs['files'].items():
-                    kwargs['files'][name] = Path(str(file)).open(mode='rb')
+                    if isinstance(file, str):
+                        kwargs['files'][name] = Path(file).open(mode='rb')
+                    else:
+                        kwargs['files'][name] = file.open(mode='rb')
             else:
                 headers['Content-Type'] = 'application/json'
                 if 'data' in kwargs:
