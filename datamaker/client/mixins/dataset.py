@@ -26,6 +26,10 @@ class DatasetClientMixin:
         path = 'data_unit_files/'
         return self._post(path, payload=data)
 
+    def calculate_checksum(self, pk):
+        path = f'data_units/{pk}/calculate_checksum/'
+        return self._get(path)
+
     def import_dataset(
         self, dataset_id, dataset, project_id=None, batch_size=1000, process_pool=10
     ):
@@ -77,6 +81,8 @@ class DatasetClientMixin:
                             'name': name,
                             'files': files,
                         })
+                    # update checksum
+                    self.calculate_checksum(data_unit['id'])
 
             if project_id:
                 labels_data = []
