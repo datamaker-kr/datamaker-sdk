@@ -53,7 +53,6 @@ class BaseImport(BasePlugin):
 
     def get_storage(self):
         storage = self.client.get_storage(self.storage_id)
-        provider = import_string(REGISTRIES['STORAGE_PROVIDERS'][storage['provider']])(
+        return import_string(REGISTRIES['STORAGE_PROVIDERS'][storage['provider']])(
             storage['configuration']
         )
-        return provider
