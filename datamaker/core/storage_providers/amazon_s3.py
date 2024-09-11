@@ -6,7 +6,6 @@ from datamaker.core.storage_providers import BaseProvider
 
 class AmazonS3StorageProvider(BaseProvider):
     label = 'Amazon S3'
-    supports_external = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
