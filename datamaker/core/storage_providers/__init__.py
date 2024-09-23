@@ -1,8 +1,8 @@
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod, ABC
 from typing import Optional
 
 
-class BaseProvider(metaclass=ABCMeta):
+class BaseStorageProvider(ABC):
     @property
     @abstractmethod
     def label(self):
@@ -14,5 +14,6 @@ class BaseProvider(metaclass=ABCMeta):
 
         self.configuration = configuration
 
+    @abstractmethod
     def get_pathlib(self):
         raise NotImplementedError

@@ -1,10 +1,10 @@
 from pathlib import Path
 
 
-from datamaker.core.storage_providers import BaseProvider
+from datamaker.core.storage_providers import BaseStorageProvider
 
 
-class FileSystemStorageProvider(BaseProvider):
+class FileSystemStorageStorageProvider(BaseStorageProvider):
     label = 'File System'
 
     def get_pathlib(self):
