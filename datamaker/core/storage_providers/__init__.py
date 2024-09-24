@@ -16,4 +16,4 @@ class BaseStorageProvider(ABC):
 
     @abstractmethod
     def get_pathlib(self):
-        raise NotImplementedError
+        pass
