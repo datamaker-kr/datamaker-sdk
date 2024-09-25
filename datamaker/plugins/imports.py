@@ -1,5 +1,6 @@
-from pathlib import Path
+from django.utils.module_loading import import_string
 
+from datamaker.core.registries import REGISTRIES
 from datamaker.plugins import BasePlugin
 
 
@@ -51,17 +52,7 @@ class BaseImport(BasePlugin):
         )
 
     def get_storage(self):
-        # TODO support multiple storages
-        class FileSystemStorage:
-            def __init__(self, location):
-                self.location = location
-
-            def get_pathlib(self):
-                return Path(self.location)
-
         storage = self.client.get_storage(self.storage_id)
-        assert (
-            storage['provider'] == 'file_system'
-            and 'location' in storage['configuration']
+        return import_string(REGISTRIES['STORAGE_PROVIDERS'][storage['provider']])(
+            storage['configuration']
         )
-        return FileSystemStorage(storage['configuration']['location'])
